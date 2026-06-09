@@ -1,0 +1,10 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+RUN pip install aiocoap --break-system-packages 2>/dev/null || \
+    pip install aiocoap
+
+COPY coap_device.py .
+
+CMD ["python", "coap_device.py"]

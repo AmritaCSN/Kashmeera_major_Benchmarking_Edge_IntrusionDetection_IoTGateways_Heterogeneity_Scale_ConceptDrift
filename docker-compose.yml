@@ -1,0 +1,44 @@
+version: '3.8'
+
+networks:
+  benign_net:
+    ipam:
+      config:
+        - subnet: 192.168.1.0/24
+  attack_net:
+    ipam:
+      config:
+        - subnet: 10.0.0.0/24
+
+services:
+  # ── BROKER ────────────────────────────────────────────────
+  broker:
+    image: eclipse-mosquitto:2.0
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+    networks:
+      benign_net:
+        ipv4_address: 192.168.1.5
+      attack_net:
+        ipv4_address: 10.0.0.5
+
+  # ── BENIGN CLIENTS (192.168.1.x) ─────────────────────────
+  benign_01: { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_01, ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.11 } } }
+  benign_02: { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_02, ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.12 } } }
+  benign_03: { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_03, ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.13 } } }
+  benign_04: { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_04, ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.14 } } }
+  benign_05: { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_05, ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.15 } } }
+  benign_06: { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_06, ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.16 } } }
+  benign_07: { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_07, ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.17 } } }
+  benign_08: { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_08, ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.18 } } }
+  benign_09: { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_09, ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.19 } } }
+  benign_10: { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_10, ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.20 } } }
+
+  # ── ATTACK CLIENTS (10.0.0.x) ────────────────────────────
+  # NOTE: attacker_slowpub replaces attacker_slowite
+  # This is a Low-Rate Pacing attack (60-120s IAT), NOT the real SlowITe
+  # (Vaccari et al., Sensors 2020) which exploits broker connection slots.
+  attacker_slowpub: { build: ., environment: [BROKER_IP=10.0.0.5, DEVICE_ID=attacker_slowpub, ROLE=slowpub], networks: { attack_net: { ipv4_address: 10.0.0.11 } } }
+  attacker_jitter:  { build: ., environment: [BROKER_IP=10.0.0.5, DEVICE_ID=attacker_jitter,  ROLE=jitter],  networks: { attack_net: { ipv4_address: 10.0.0.12 } } }
+  attacker_flood:   { build: ., environment: [BROKER_IP=10.0.0.5, DEVICE_ID=attacker_flood,   ROLE=flood],   networks: { attack_net: { ipv4_address: 10.0.0.13 } } }
+  attacker_sparse:  { build: ., environment: [BROKER_IP=10.0.0.5, DEVICE_ID=attacker_sparse,  ROLE=sparse],  networks: { attack_net: { ipv4_address: 10.0.0.14 } } }

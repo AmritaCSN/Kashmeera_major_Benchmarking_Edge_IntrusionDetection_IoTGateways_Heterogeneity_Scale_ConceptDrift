@@ -1,0 +1,112 @@
+version: '3.8'
+
+# ============================================================
+# docker-compose-scale.yml
+# Scale experiment: 50 concurrent IoT devices
+#   - 40 MQTT benign devices (192.168.1.11 - 192.168.1.50)
+#   - 06 CoAP benign devices (192.168.1.51 - 192.168.1.56)
+#   - 04 Attack devices     (10.0.0.11   - 10.0.0.14)
+# 
+# Run: docker compose -f docker-compose-scale.yml up -d
+# Stop: docker compose -f docker-compose-scale.yml down
+# ============================================================
+
+networks:
+  benign_net:
+    ipam:
+      config:
+        - subnet: 192.168.1.0/24
+  attack_net:
+    ipam:
+      config:
+        - subnet: 10.0.0.0/24
+
+services:
+  # ─── BROKER ────────────────────────────────────────────────
+  broker:
+    image: eclipse-mosquitto:2.0
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+    networks:
+      benign_net:
+        ipv4_address: 192.168.1.5
+      attack_net:
+        ipv4_address: 10.0.0.5
+
+  # ─── CoAP GATEWAY (listens for CoAP devices) ───────────────
+  coap_server:
+    build:
+      context: .
+      dockerfile: Dockerfile.coap
+    environment:
+      - ROLE=coap_server
+    networks:
+      benign_net:
+        ipv4_address: 192.168.1.100
+    ports:
+      - "5683:5683/udp"
+
+  # ─── 40 MQTT BENIGN DEVICES ────────────────────────────────
+  benign_01:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_01,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.11 } } }
+  benign_02:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_02,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.12 } } }
+  benign_03:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_03,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.13 } } }
+  benign_04:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_04,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.14 } } }
+  benign_05:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_05,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.15 } } }
+  benign_06:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_06,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.16 } } }
+  benign_07:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_07,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.17 } } }
+  benign_08:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_08,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.18 } } }
+  benign_09:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_09,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.19 } } }
+  benign_10:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_10,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.20 } } }
+  benign_11:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_11,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.21 } } }
+  benign_12:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_12,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.22 } } }
+  benign_13:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_13,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.23 } } }
+  benign_14:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_14,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.24 } } }
+  benign_15:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_15,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.25 } } }
+  benign_16:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_16,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.26 } } }
+  benign_17:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_17,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.27 } } }
+  benign_18:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_18,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.28 } } }
+  benign_19:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_19,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.29 } } }
+  benign_20:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_20,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.30 } } }
+  benign_21:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_21,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.31 } } }
+  benign_22:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_22,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.32 } } }
+  benign_23:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_23,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.33 } } }
+  benign_24:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_24,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.34 } } }
+  benign_25:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_25,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.35 } } }
+  benign_26:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_26,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.36 } } }
+  benign_27:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_27,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.37 } } }
+  benign_28:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_28,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.38 } } }
+  benign_29:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_29,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.39 } } }
+  benign_30:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_30,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.40 } } }
+  benign_31:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_31,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.41 } } }
+  benign_32:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_32,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.42 } } }
+  benign_33:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_33,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.43 } } }
+  benign_34:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_34,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.44 } } }
+  benign_35:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_35,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.45 } } }
+  benign_36:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_36,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.46 } } }
+  benign_37:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_37,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.47 } } }
+  benign_38:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_38,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.48 } } }
+  benign_39:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_39,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.49 } } }
+  benign_40:  { build: ., environment: [BROKER_IP=192.168.1.5, DEVICE_ID=benign_40,  ROLE=benign], networks: { benign_net: { ipv4_address: 192.168.1.50 } } }
+
+  # ─── 6 CoAP BENIGN DEVICES ─────────────────────────────────
+  coap_01: { build: { context: ., dockerfile: Dockerfile.coap }, environment: [COAP_SERVER=192.168.1.100, DEVICE_ID=coap_01, ROLE=coap_client], networks: { benign_net: { ipv4_address: 192.168.1.51 } } }
+  coap_02: { build: { context: ., dockerfile: Dockerfile.coap }, environment: [COAP_SERVER=192.168.1.100, DEVICE_ID=coap_02, ROLE=coap_client], networks: { benign_net: { ipv4_address: 192.168.1.52 } } }
+  coap_03: { build: { context: ., dockerfile: Dockerfile.coap }, environment: [COAP_SERVER=192.168.1.100, DEVICE_ID=coap_03, ROLE=coap_client], networks: { benign_net: { ipv4_address: 192.168.1.53 } } }
+  coap_04: { build: { context: ., dockerfile: Dockerfile.coap }, environment: [COAP_SERVER=192.168.1.100, DEVICE_ID=coap_04, ROLE=coap_client], networks: { benign_net: { ipv4_address: 192.168.1.54 } } }
+  coap_05: { build: { context: ., dockerfile: Dockerfile.coap }, environment: [COAP_SERVER=192.168.1.100, DEVICE_ID=coap_05, ROLE=coap_client], networks: { benign_net: { ipv4_address: 192.168.1.55 } } }
+  coap_06: { build: { context: ., dockerfile: Dockerfile.coap }, environment: [COAP_SERVER=192.168.1.100, DEVICE_ID=coap_06, ROLE=coap_client], networks: { benign_net: { ipv4_address: 192.168.1.56 } } }
+
+  
+  # ─── 12 ATTACK DEVICES (3 instances per attack type) ───────
+  attacker_slowpub_1: { build: ., environment: [BROKER_IP=10.0.0.5, DEVICE_ID=attacker_slowpub_1, ROLE=slowpub], networks: { attack_net: { ipv4_address: 10.0.0.11 } } }
+  attacker_slowpub_2: { build: ., environment: [BROKER_IP=10.0.0.5, DEVICE_ID=attacker_slowpub_2, ROLE=slowpub], networks: { attack_net: { ipv4_address: 10.0.0.15 } } }
+  attacker_slowpub_3: { build: ., environment: [BROKER_IP=10.0.0.5, DEVICE_ID=attacker_slowpub_3, ROLE=slowpub], networks: { attack_net: { ipv4_address: 10.0.0.16 } } }
+  attacker_jitter_1:  { build: ., environment: [BROKER_IP=10.0.0.5, DEVICE_ID=attacker_jitter_1,  ROLE=jitter],  networks: { attack_net: { ipv4_address: 10.0.0.12 } } }
+  attacker_jitter_2:  { build: ., environment: [BROKER_IP=10.0.0.5, DEVICE_ID=attacker_jitter_2,  ROLE=jitter],  networks: { attack_net: { ipv4_address: 10.0.0.17 } } }
+  attacker_jitter_3:  { build: ., environment: [BROKER_IP=10.0.0.5, DEVICE_ID=attacker_jitter_3,  ROLE=jitter],  networks: { attack_net: { ipv4_address: 10.0.0.18 } } }
+  attacker_flood_1:   { build: ., environment: [BROKER_IP=10.0.0.5, DEVICE_ID=attacker_flood_1,   ROLE=flood],   networks: { attack_net: { ipv4_address: 10.0.0.13 } } }
+  attacker_flood_2:   { build: ., environment: [BROKER_IP=10.0.0.5, DEVICE_ID=attacker_flood_2,   ROLE=flood],   networks: { attack_net: { ipv4_address: 10.0.0.19 } } }
+  attacker_flood_3:   { build: ., environment: [BROKER_IP=10.0.0.5, DEVICE_ID=attacker_flood_3,   ROLE=flood],   networks: { attack_net: { ipv4_address: 10.0.0.20 } } }
+  attacker_sparse_1:  { build: ., environment: [BROKER_IP=10.0.0.5, DEVICE_ID=attacker_sparse_1,  ROLE=sparse],  networks: { attack_net: { ipv4_address: 10.0.0.14 } } }
+  attacker_sparse_2:  { build: ., environment: [BROKER_IP=10.0.0.5, DEVICE_ID=attacker_sparse_2,  ROLE=sparse],  networks: { attack_net: { ipv4_address: 10.0.0.21 } } }
+  attacker_sparse_3:  { build: ., environment: [BROKER_IP=10.0.0.5, DEVICE_ID=attacker_sparse_3,  ROLE=sparse],  networks: { attack_net: { ipv4_address: 10.0.0.22 } } }

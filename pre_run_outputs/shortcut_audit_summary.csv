@@ -1,0 +1,6 @@
+Dataset,Full_Name,Protocol,Feature_Schema,N_Samples,N_Features,Benign_Count,Attack_Count,RF_F1_Weighted,RF_F1_Macro,AUC_ROC,FPR,SDS_k5,Top1_Feature,Top1_Type,Top2_Feature,Top3_Feature,Shortcut_Dominated
+MQTTEEB-D,MQTTEEB-D (Chaudhari et al. 2023),MQTT,Packet-level (Wireshark/tshark dissection),222567,8,17557,205010,0.8438,0.7548,0.9126,0.1512,0.6,tcp_len,volumetric,tcp_time_delta,timestamp,True
+MQTT-IoT-IDS2020,MQTT-IoT-IDS2020 (Hindy et al. 2021),MQTT (TCP port 1883),Biflow — fwd/bwd IAT stats + pkt length stats + TCP flags,259379,26,188378,71001,0.9993,0.9992,1.0,0.0004,1.0,fwd_mean_pkt_len,volumetric,bwd_min_pkt_len,fwd_std_pkt_len,True
+TON-IoT,TON-IoT (Moustafa et al. 2021),Multi-protocol (TCP/UDP/ICMP),CICFlowMeter-style network flows,211043,12,50000,161043,0.9891,0.9849,0.9948,0.0396,0.6,src_pkts,volumetric,dst_pkts,dns_qtype,True
+CIC-IoT-2023,CIC-IoT-2023 (Neto et al. 2023),Multi-protocol IoT,CICFlowMeter-style network flows,238687,46,5600,233087,0.9926,0.9868,0.9994,0.0045,0.0,rst_count,legitimate,urg_count,Variance,False
+REA-HID (Ours),REA-HID (Proposed Dataset),MQTT + CoAP,NFStream Flow-level,11413,66,9305,2108,0.9099,0.8492,0.9258,0.05,0.0,src2dst_mean_piat_ms,legitimate,src2dst_min_piat_ms,src2dst_max_piat_ms,False

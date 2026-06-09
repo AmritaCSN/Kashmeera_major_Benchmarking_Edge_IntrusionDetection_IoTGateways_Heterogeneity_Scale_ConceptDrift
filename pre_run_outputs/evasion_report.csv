@@ -1,0 +1,5 @@
+Attack,Total,Evaded,Evasion_Rate_%
+Attack_Flood,96,0,0.0
+Attack_Jitter,131,81,61.8
+Attack_SlowPub,104,55,52.9
+Attack_Sparse,91,0,0.0
