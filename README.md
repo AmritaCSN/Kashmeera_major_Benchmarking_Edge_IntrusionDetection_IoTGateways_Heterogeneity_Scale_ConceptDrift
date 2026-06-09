@@ -8,7 +8,6 @@
 **Institution:** Center for Cybersecurity Systems and Networks, Amrita Vishwa Vidyapeetham, Amritapuri
 
 **Building on:**
-- [Time-based Trojan Detection using Ensemble Learning](https://doi.org/10.1109/ICIMIA67127.2025.11200592) — IEEE ICIMIA 2025
 - [Replay-Enhanced Adaptive Hybrid Intrusion Detection (REA-HID) for IoT Edge Gateways](https://doi.org/10.1109/ICSEDIS68157.2026.11517953) — IEEE ICSEDIS 2026
 
 ---
@@ -286,11 +285,13 @@ See `architecture_diagram.png` for the full visual diagram. The framework has th
 
 **Layer 1 — Docker Simulation (Data Generation)**
 ```
-Benign subnet (192.168.1.x)          Attack subnet (10.0.0.x)
-  40x MQTT sensors (iot_device.py)     3x Jitter attackers
-  6x  CoAP devices (coap_device.py)    3x SlowPub attackers
-          |                             3x Flood attackers
-          |                             3x Sparse attackers
+Benign subnet (192.168.1.x)                      Attack subnet (10.0.0.x)
+  40x MQTT sensors (iot_device.py)                  3x Jitter attackers
+  6x  CoAP devices (coap_device.py)                 3x SlowPub attackers
+          |                                         3x Flood attackers
+          |                                         3x Sparse attackers
+          |                                                   |
+          |                                                   | 
           +---------> Mosquitto Broker (port 1883) <----------+
                                |
                           tcpdump capture
@@ -389,10 +390,8 @@ Where:
 1. **K. R, P. Madhu, V. K K, D. Rajeev, K. Jain, and P. Krishnan**, "Time-based Trojan Detection using Ensemble Learning," in *Proc. IEEE ICIMIA 2025*, Sep. 2025.  
    DOI: [10.1109/ICIMIA67127.2025.11200592](https://doi.org/10.1109/ICIMIA67127.2025.11200592)
 
-2. **K. R, P. Krishnan, H. N. N, S. Subramanian N, and K. Jain**, "Replay-Enhanced Adaptive Hybrid Intrusion Detection (REA-HID) for IoT Edge Gateways," in *Proc. IEEE ICSEDIS 2026*, pp. 1071–1076.  
-   ISBN: 979-8-3315-8823-6
+2. **K. R, P. Krishnan, H. N. N, S. Subramanian N, and K. Jain**, "Replay-Enhanced Adaptive Hybrid Intrusion Detection (REA-HID) for IoT Edge Gateways," in *Proc. IEEE ICSEDIS 2026*, DOI: [10.1109/ICSEDIS68157.2026.11517953](https://doi.org/10.1109/ICSEDIS68157.2026.11517953)
 
-3. **K. R et al.**, "Benchmarking Edge Intrusion Detection in IoT Gateways Under Heterogeneity, Scale, and Concept Drift," *IEEE Internet of Things Journal* — in preparation.
 
 ---
 
