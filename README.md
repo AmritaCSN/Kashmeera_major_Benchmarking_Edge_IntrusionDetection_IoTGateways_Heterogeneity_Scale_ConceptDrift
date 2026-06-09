@@ -9,7 +9,7 @@
 
 **Building on:**
 - [Time-based Trojan Detection using Ensemble Learning](https://doi.org/10.1109/ICIMIA67127.2025.11200592) — IEEE ICIMIA 2025
-- Replay-Enhanced Adaptive Hybrid Intrusion Detection (REA-HID) for IoT Edge Gateways — IEEE ICSEDIS 2026
+- [Replay-Enhanced Adaptive Hybrid Intrusion Detection (REA-HID) for IoT Edge Gateways](https://doi.org/10.1109/ICSEDIS68157.2026.11517953) — IEEE ICSEDIS 2026
 
 ---
 
