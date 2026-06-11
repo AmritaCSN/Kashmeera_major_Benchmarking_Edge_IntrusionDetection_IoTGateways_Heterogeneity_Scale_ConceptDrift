@@ -141,6 +141,92 @@ Download the following datasets and place them at the paths shown:
 If public datasets are not available, the shortcut audit will still run on the REA-HID dataset alone.
 
 ---
+## System Architecture
+ The framework has three layers:
+
+**Layer 1 — Docker Simulation (Data Generation)**
+```
+Benign subnet (192.168.1.x)                      Attack subnet (10.0.0.x)
+  40x MQTT sensors (iot_device.py)                  3x Jitter attackers
+  6x  CoAP devices (coap_device.py)                 3x SlowPub attackers
+          |                                         3x Flood attackers
+          |                                         3x Sparse attackers
+          |                                                   |
+          |                                                   | 
+          +---------> Mosquitto Broker (port 1883) <----------+
+                               |
+                          tcpdump capture
+                               |
+                          PCAP files
+```
+
+**Layer 2 — Flow Extraction and Labelling**
+```
+PCAP files
+    |
+    +--> extract_final_v1.1.py (NFStream, timeout=120s)
+    |         --> final_mqtt_coap_flows.csv (unlabelled)
+    |
+    +--> label_final_v1.1.py (IP subnet ground truth)
+              --> dataset_mqtt_coap_final.csv (11,413 labelled flows)
+```
+
+**Layer 3 — Evaluation Pipeline**
+```
+dataset_mqtt_coap_final.csv
+    |
+    +-- shortcut_audit_multi_v2.py  --> SDS scores, SHAP, Gini, Permutation
+    |
+    +-- final_evaluation.py         --> RF 0.9043±0.003, ablation 0.006 drop
+    |
+    +-- prove_evasion.py            --> Jitter 61.8%, SlowPub 52.9% evasion
+    |
+    +-- multi_model_benchmark.py    --> Architecture convergence (spread 0.011)
+    |
+    +-- heterogeneity_proof.py      --> Protocol-agnostic IAT dominance
+
+Layer 4 — HITL Deployment (Raspberry Pi 4)
+    |
+    +-- streaming_listener_v2.py    --> Live inference, Page-Hinkley drift
+    |
+    +-- monitor_resources.py        --> CPU/RAM/temp profiling
+              --> 207ms peak latency at 200 devices
+              --> ~578-device deployment ceiling
+```
+
+---
+
+## Shortcut Dominance Score (SDS) — The Core Metric
+
+SDS is defined as:
+
+```
+SDS = (number of top-k features that are volumetric or temporal leakage artefacts) / k
+```
+
+Where:
+- **Volumetric artefacts:** raw packet sizes, byte counts, packet counts
+- **Temporal leakage artefacts:** absolute timestamps, flow duration, TCP time delta
+- **k = 5** (default) — top 5 features by Gini importance
+
+| SDS Value | Interpretation |
+|-----------|----------------|
+| 0.00 | Behaviour-driven — model learns genuine temporal signals |
+| 0.40–0.59 | Mixed — partial shortcut reliance |
+| 0.60–1.00 | Shortcut-dominated — high-accuracy scores are illusory |
+
+---
+
+## Attack Taxonomy
+
+| Attack | IAT Range | Evasion Rate | Detection Feature | Key Property |
+|--------|-----------|--------------|-------------------|--------------|
+| Attack_Jitter | 30–60s | 61.8% | bidirectional_mean_piat_ms | Overlaps benign IAT by design — does not adapt post-drift |
+| Attack_SlowPub | 60–120s | 52.9% | dst2src_mean_piat_ms | Overlaps post-drift benign baseline (50–90s) |
+| Attack_Flood | Burst + 150–180s | 0.0% | bidirectional_stddev_piat_ms | Burst creates distinctive standard deviation signature |
+| Attack_Sparse | 120–300s | 0.0% | bidirectional_packets | Protocol-only flow — no PUBLISH packets in 120s window |
+
+**Core structural finding:** Evasion succeeds if and only if the attack IAT distribution overlaps with the benign distribution at detection time. This is the fundamental detection boundary of snapshot-based classification.
 
 ## Quick Start — Full Pipeline End to End
 
@@ -280,92 +366,6 @@ python rpi_traffic_sender.py --broker <rpi-ip> --role flood  --count 3 --duratio
 
 ---
 
-## System Architecture
- The framework has three layers:
-
-**Layer 1 — Docker Simulation (Data Generation)**
-```
-Benign subnet (192.168.1.x)                      Attack subnet (10.0.0.x)
-  40x MQTT sensors (iot_device.py)                  3x Jitter attackers
-  6x  CoAP devices (coap_device.py)                 3x SlowPub attackers
-          |                                         3x Flood attackers
-          |                                         3x Sparse attackers
-          |                                                   |
-          |                                                   | 
-          +---------> Mosquitto Broker (port 1883) <----------+
-                               |
-                          tcpdump capture
-                               |
-                          PCAP files
-```
-
-**Layer 2 — Flow Extraction and Labelling**
-```
-PCAP files
-    |
-    +--> extract_final_v1.1.py (NFStream, timeout=120s)
-    |         --> final_mqtt_coap_flows.csv (unlabelled)
-    |
-    +--> label_final_v1.1.py (IP subnet ground truth)
-              --> dataset_mqtt_coap_final.csv (11,413 labelled flows)
-```
-
-**Layer 3 — Evaluation Pipeline**
-```
-dataset_mqtt_coap_final.csv
-    |
-    +-- shortcut_audit_multi_v2.py  --> SDS scores, SHAP, Gini, Permutation
-    |
-    +-- final_evaluation.py         --> RF 0.9043±0.003, ablation 0.006 drop
-    |
-    +-- prove_evasion.py            --> Jitter 61.8%, SlowPub 52.9% evasion
-    |
-    +-- multi_model_benchmark.py    --> Architecture convergence (spread 0.011)
-    |
-    +-- heterogeneity_proof.py      --> Protocol-agnostic IAT dominance
-
-Layer 4 — HITL Deployment (Raspberry Pi 4)
-    |
-    +-- streaming_listener_v2.py    --> Live inference, Page-Hinkley drift
-    |
-    +-- monitor_resources.py        --> CPU/RAM/temp profiling
-              --> 207ms peak latency at 200 devices
-              --> ~578-device deployment ceiling
-```
-
----
-
-## Shortcut Dominance Score (SDS) — The Core Metric
-
-SDS is defined as:
-
-```
-SDS = (number of top-k features that are volumetric or temporal leakage artefacts) / k
-```
-
-Where:
-- **Volumetric artefacts:** raw packet sizes, byte counts, packet counts
-- **Temporal leakage artefacts:** absolute timestamps, flow duration, TCP time delta
-- **k = 5** (default) — top 5 features by Gini importance
-
-| SDS Value | Interpretation |
-|-----------|----------------|
-| 0.00 | Behaviour-driven — model learns genuine temporal signals |
-| 0.40–0.59 | Mixed — partial shortcut reliance |
-| 0.60–1.00 | Shortcut-dominated — high-accuracy scores are illusory |
-
----
-
-## Attack Taxonomy
-
-| Attack | IAT Range | Evasion Rate | Detection Feature | Key Property |
-|--------|-----------|--------------|-------------------|--------------|
-| Attack_Jitter | 30–60s | 61.8% | bidirectional_mean_piat_ms | Overlaps benign IAT by design — does not adapt post-drift |
-| Attack_SlowPub | 60–120s | 52.9% | dst2src_mean_piat_ms | Overlaps post-drift benign baseline (50–90s) |
-| Attack_Flood | Burst + 150–180s | 0.0% | bidirectional_stddev_piat_ms | Burst creates distinctive standard deviation signature |
-| Attack_Sparse | 120–300s | 0.0% | bidirectional_packets | Protocol-only flow — no PUBLISH packets in 120s window |
-
-**Core structural finding:** Evasion succeeds if and only if the attack IAT distribution overlaps with the benign distribution at detection time. This is the fundamental detection boundary of snapshot-based classification.
 
 ---
 
