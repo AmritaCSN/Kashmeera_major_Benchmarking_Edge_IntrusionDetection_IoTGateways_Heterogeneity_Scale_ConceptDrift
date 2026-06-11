@@ -16,18 +16,18 @@
 
 This project introduces a **reproducible, live-streaming benchmarking framework** for evaluating Edge Machine Learning (EdgeML) Intrusion Detection Systems (IDS) deployed on resource-constrained IoT gateways.
 
-Current public IoT IDS benchmarks consistently report F1-scores above 99%. **We prove these scores are illusory.** Models trained on standard corpora such as MQTTEEB-D and MQTT-IoT-IDS2020 exploit volumetric recording artifacts — raw packet sizes, absolute timestamps, and TCP time deltas — rather than learning genuine attack behaviour. We call this the **Accuracy Illusion**.
+Current public IoT IDS benchmarks consistently report F1-scores above 99%. **We prove these scores are illusory.** Models trained on standard corpora such as MQTTEEB-D and MQTT-IoT-IDS2020 exploit volumetric recording artifacts — raw packet sizes, absolute timestamps, and TCP time deltas , rather than learning genuine attack behaviour. We call this the **Accuracy Illusion**.
 
 This framework addresses three failure modes that no existing benchmark tests simultaneously:
 
 **1. Shortcut Learning (Predictive Invalidity)**  
-We introduce the **Shortcut Dominance Score (SDS)** — the first scalar metric for quantifying shortcut learning risk in IoT IDS datasets. Applied across five public benchmarks, SDS reveals that three of four MQTT corpora are shortcut-dominated (SDS >= 0.60). MQTT-IoT-IDS2020 achieves F1=1.000 across three model architectures — a mathematical impossibility under genuine behavioral detection.
+We introduce the **Shortcut Dominance Score (SDS)** — the first scalar metric for quantifying shortcut learning risk in IoT IDS datasets. Applied across five public benchmarks, SDS reveals that three of four MQTT corpora are shortcut-dominated (SDS >= 0.60). MQTT-IoT-IDS2020 achieves F1=1.000 across three model architectures ,a mathematical impossibility under genuine behavioral detection.
 
 **2. Timing-Aware Evasion (The Detection Boundary)**  
-Low-and-slow attacks that pace within the benign Inter-Arrival Time (IAT) envelope achieve 61.8% evasion against static ML classifiers, even after all volumetric shortcuts are eliminated. We prove that evasion succeeds if and only if the attack IAT distribution overlaps the benign distribution — a structural detection boundary not previously characterised in the literature.
+Low-and-slow attacks that pace within the benign Inter-Arrival Time (IAT) envelope achieve 61.8% evasion against static ML classifiers, even after all volumetric shortcuts are eliminated. We prove that evasion succeeds if and only if the attack IAT distribution overlaps the benign distribution , a structural detection boundary not previously characterised in the literature.
 
 **3. Hardware Deployment Ceiling**  
-On a Raspberry Pi 4 running the full live IDS pipeline, per-flow inference latency reaches 207ms under 200 concurrent devices — 53x higher than the server baseline of 3.9ms. NFStream stateful RAM grows non-linearly from +15MB at 10 devices to +237MB at 200 devices. We establish a concrete deployment ceiling of approximately 578 concurrent devices before real-time classification guarantees are lost.
+On a Raspberry Pi 4 running the full live IDS pipeline, per-flow inference latency reaches 207ms under 200 concurrent devices , 53x higher than the server baseline of 3.9ms. NFStream stateful RAM grows non-linearly from +15MB at 10 devices to +237MB at 200 devices. We establish a concrete deployment ceiling of approximately 578 concurrent devices before real-time classification guarantees are lost.
 
 ---
 
@@ -40,6 +40,7 @@ On a Raspberry Pi 4 running the full live IDS pipeline, per-flow inference laten
 - Demonstrates that under volumetric feature parity, **model architecture is a resource variable, not a performance variable** (spread collapses from 0.147 to 0.011)
 
 ---
+<img width="1381" height="920" alt="image" src="https://github.com/user-attachments/assets/416bd898-6c3b-4829-9791-0d9bd17285d6" />
 
 ## Key Results
 
@@ -280,8 +281,7 @@ python rpi_traffic_sender.py --broker <rpi-ip> --role flood  --count 3 --duratio
 ---
 
 ## System Architecture
-
-See `architecture_diagram.png` for the full visual diagram. The framework has three layers:
+ The framework has three layers:
 
 **Layer 1 — Docker Simulation (Data Generation)**
 ```
